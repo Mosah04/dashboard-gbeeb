@@ -15,12 +15,15 @@ import {
 
 export const columns = [
   {
-    accessorKey: "image",
+    accessorKey: "imageURL",
     header: "",
     cell: ({ row }) => {
       return (
         <Avatar className="h-12 w-12 rounded-lg">
-          <AvatarImage src={row.getValue("image")} alt={row.getValue("name")} />
+          <AvatarImage
+            src={row.getValue("imageURL")}
+            alt={row.getValue("name")}
+          />
           <AvatarFallback className="rounded-lg">
             {row
               .getValue("name")

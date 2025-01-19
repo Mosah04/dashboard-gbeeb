@@ -1,6 +1,23 @@
 import { registerParticipant } from "@/lib/actions/participant.action";
-import { headers } from "next/headers";
+import { createSessionClient } from "@/lib/appwrite.config";
+import { revalidatePath } from "next/cache";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
+
+export async function GET(req) {
+  const sessionCookie = (await cookies()).get("session");
+  try {
+    const { databases } = await createSessionClient(sessionCookie.value);
+    const { documents: participants } = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      process.env.PARTICIPANTS_COLLECTION_ID
+    );
+    return NextResponse.json({ participants }, { status: 200 });
+  } catch (error) {
+    console.log("Erreur lors de la lecture", error);
+    return NextResponse.json({ message: "Access Denied" }, { status: 403 });
+  }
+}
 
 export async function POST(req) {
   const headersList = await headers();
@@ -37,6 +54,7 @@ export async function POST(req) {
       formData.get("image"),
       participant
     );
+    if (registeredParticipant) revalidatePath("/paticipants");
     return NextResponse.json(
       { success: true, participant: registeredParticipant },
       { status: 200 }
