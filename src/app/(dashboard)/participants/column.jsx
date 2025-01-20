@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 export const columns = [
   {
@@ -63,7 +65,60 @@ export const columns = [
     accessorKey: "paymentDone",
     header: "Paiement",
     cell: ({ row }) => {
-      return <Switch checked={row.getValue("paymentDone")} />;
+      const participant = row.original;
+      const [paymentDone, setPaymentDone] = useState(participant.paymentDone);
+      return (
+        <Switch
+          checked={paymentDone}
+          onCheckedChange={async () => {
+            let stringifiedData;
+            setPaymentDone((oldChecked) => {
+              stringifiedData = JSON.stringify({
+                ...participant,
+                paymentDone: !oldChecked,
+              });
+              return !oldChecked;
+            });
+            try {
+              const response = await fetch(
+                (process.env.NEXT_PUBLIC_DEPLOYMENT_URL ||
+                  "http://localhost:8080") + "/api/participants",
+                {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json", // Important pour signaler que le contenu est du JSON
+                  },
+                  body: stringifiedData,
+                }
+              );
+              if (response.ok) {
+                toast({
+                  title: "Succès",
+                  description: "Paiement mis à jour!",
+                  duration: 5000,
+                });
+              } else {
+                toast({
+                  title: "Erreur",
+                  description: "Le paiement n'a pas été mis à jour!",
+                  variant: "destructive",
+                  duration: 5000,
+                });
+                setPaymentDone((oldChecked) => !oldChecked);
+              }
+            } catch (error) {
+              toast({
+                title: "Erreur",
+                description: "Le paiement n'a pas été mis à jour",
+                variant: "destructive",
+                duration: 5000,
+              });
+              console.log("Erreur lors de la modification", error);
+              setPaymentDone((oldChecked) => !oldChecked);
+            }
+          }}
+        />
+      );
     },
   },
   {
@@ -87,8 +142,7 @@ export const columns = [
               Voir le badge
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Modifier</DropdownMenuItem>
-            <DropdownMenuItem>Supprimer</DropdownMenuItem>
+            <DropdownMenuItem>Voir le participant</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

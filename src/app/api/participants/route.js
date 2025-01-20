@@ -3,6 +3,7 @@ import { createSessionClient } from "@/lib/appwrite.config";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { Query } from "node-appwrite";
 
 export async function GET(req) {
   const sessionCookie = (await cookies()).get("session");
@@ -10,7 +11,8 @@ export async function GET(req) {
     const { databases } = await createSessionClient(sessionCookie.value);
     const { documents: participants } = await databases.listDocuments(
       process.env.DATABASE_ID,
-      process.env.PARTICIPANTS_COLLECTION_ID
+      process.env.PARTICIPANTS_COLLECTION_ID,
+      [Query.orderDesc("$createdAt")]
     );
     return NextResponse.json({ participants }, { status: 200 });
   } catch (error) {
@@ -69,3 +71,45 @@ export async function POST(req) {
     );
   }
 }
+
+export async function PATCH(req) {
+  const sessionCookie = (await cookies()).get("session");
+  try {
+    const { databases } = await createSessionClient(sessionCookie.value);
+    const participant = await req.json();
+
+    const updatedParticipant = await databases.updateDocument(
+      participant.$databaseId,
+      participant.$collectionId,
+      participant.$id,
+      cleanSpecialAttributes(participant)
+    );
+
+    if (!updatedParticipant)
+      throw new Error("Failed to update the participant payment state");
+
+    revalidatePath("/participants");
+
+    return NextResponse.json(
+      { success: true, participant: updatedParticipant },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      {
+        error: "An error occurred while processing the data.",
+        details: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+const cleanSpecialAttributes = (data) => {
+  const keys = Object.keys(data);
+  keys.forEach((key) => {
+    if (key.startsWith("$")) delete data[key];
+  });
+  return data;
+};

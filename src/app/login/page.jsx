@@ -20,11 +20,7 @@ export default async function LoginPage() {
         </a>
         <LoginForm />
       </div>
-      <Toaster
-        toastOptions={{
-          position: "top-right",
-        }}
-      />
+      <Toaster />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { ID, Query } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 import { parseStringify } from "../utils";
-import { createAdminClient } from "../appwrite.config";
+import { createAdminClient, createSessionClient } from "../appwrite.config";
 
 export const registerParticipant = async (participantImage, participant) => {
   let file;
@@ -32,3 +32,5 @@ export const registerParticipant = async (participantImage, participant) => {
 
   return parseStringify(newParticipant);
 };
+
+export const updateParticipantPayment = async (documentId, paymentDone) => {};

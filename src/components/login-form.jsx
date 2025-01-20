@@ -45,7 +45,6 @@ export function LoginForm({ className, ...props }) {
         toast({
           title: "Connexion réussie",
           description: "Vous êtes connecté avec succès !",
-          variant: "success",
           duration: 5000,
         });
 
