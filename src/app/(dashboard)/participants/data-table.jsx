@@ -46,9 +46,13 @@ export function DataTable({ columns, data }) {
         <div className="flex flex-row flex-wrap gap-4 justify-between max-lg:w-full">
           <div className="flex flex-1 basis-2/3 gap-2">
             <Input
-              className="min-w-[100px]"
+              className="min-w-[100px] text-sm"
               type="text"
-              placeholder="Rechercher"
+              placeholder={
+                columnToFilter
+                  ? "Recherchez maintenant"
+                  : "Choisissez d'abord un filtre"
+              }
               value={
                 columnToFilter &&
                 (table.getColumn(columnToFilter)?.getFilterValue() ?? "")
