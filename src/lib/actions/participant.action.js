@@ -72,7 +72,7 @@ export const updateParticipant = async (participant) => {
     return { updatedParticipant };
   } catch (error) {
     console.log("Erreur lors de la modification du participant", error);
-    throw new Error("Erreur lors de la modification du participants");
+    throw new Error("Erreur lors de la modification du participant");
   }
 };
 
@@ -82,4 +82,31 @@ const cleanSpecialAttributes = (data) => {
     if (key.startsWith("$")) delete data[key];
   });
   return data;
+};
+
+export const deleteParticipant = async (participant) => {
+  const sessionCookie = (await cookies()).get("session");
+  try {
+    const { databases, storage } = await createSessionClient(
+      sessionCookie.value
+    );
+
+    await storage.deleteFile(
+      process.env.NEXT_PUBLIC_BUCKET_ID,
+      participant.imageId
+    );
+
+    await databases.deleteDocument(
+      participant.$databaseId,
+      participant.$collectionId,
+      participant.$id
+    );
+
+    revalidatePath("/participants");
+
+    return;
+  } catch (error) {
+    console.log("Erreur lors de la suppression du participant", error);
+    throw new Error("Erreur lors de la suppression du participant");
+  }
 };

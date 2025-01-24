@@ -110,9 +110,10 @@ export const columns = [
     id: "actions",
     cell: ({ row }) => {
       const participant = row.original;
+      const [open, setOpen] = useState(false);
 
       return (
-        <DropdownMenu>
+        <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Ouvrir le menu</span>
@@ -121,14 +122,18 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>Voir le badge: J'y suis</DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(participant.email)}
+            // onClick={() => navigator.clipboard.writeText(participant.email)}
             >
-              Voir le badge
+              Voir le badge: J'y serai
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <ParticipantDialog participant={participant} />
+              <ParticipantDialog
+                participant={participant}
+                onClose={() => setOpen(false)}
+              />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

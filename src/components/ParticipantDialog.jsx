@@ -26,7 +26,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { updateParticipant } from "@/lib/actions/participant.action";
+import {
+  deleteParticipant,
+  updateParticipant,
+} from "@/lib/actions/participant.action";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Zod validation schema
 const sexOptions = ["Masculin", "Féminin"];
@@ -71,7 +85,7 @@ const participantSchema = z.object({
   otherPaymentMode: z.boolean().optional(),
 });
 
-export function ParticipantDialog({ participant }) {
+export function ParticipantDialog({ participant, onClose }) {
   const [otherCell, setOtherCell] = useState(
     !cellOptions.includes(participant.cell)
   );
@@ -82,6 +96,7 @@ export function ParticipantDialog({ participant }) {
     paymentOptions.indexOf(participant.paymentMode) === -1
   );
 
+  const [open, setOpen] = useState(false);
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -135,8 +150,39 @@ export function ParticipantDialog({ participant }) {
     }
   };
 
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await deleteParticipant(participant);
+      toast({
+        title: "Succès",
+        description: "Participant supprimé",
+        duration: 5000,
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Le participant n'a pas été supprimé",
+        variant: "destructive",
+        duration: 5000,
+      });
+      console.log("Erreur lors de la suppression", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen && onClose) {
+          onClose();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="ghost" className="w-full font-normal">
           Voir le participant
@@ -160,7 +206,7 @@ export function ParticipantDialog({ participant }) {
             <div className="relative">
               <Avatar className="h-28 w-28 rounded-full p-1 border-2 border-primary">
                 <AvatarImage
-                  className="rounded-full"
+                  className="rounded-full object-cover object-top"
                   src={participant.imageURL}
                   alt={participant.name}
                 />
@@ -483,6 +529,7 @@ export function ParticipantDialog({ participant }) {
               setActive((active) => !active);
             }}
             type="button"
+            variant="outline"
           >
             {!active ? "Modifier" : "Annuler"}
           </Button>
@@ -498,9 +545,38 @@ export function ParticipantDialog({ participant }) {
               {loading && <Loader className="animate-spin" />}
             </Button>
           )}
-          <Button disabled={loading} type="button" variant="destructive">
-            Supprimer le participant
-          </Button>
+
+          {!active && (
+            <AlertDialog>
+              <AlertDialogTrigger disabled={loading} asChild>
+                <Button type="button" variant="destructive">
+                  Supprimer le participant
+                  {loading && <Loader className="animate-spin" />}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Voulez-vous vraiment supprimer le participant?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Toutes les données relatives
+                    au participant seront supprimées des serveurs.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={loading}
+                    onClick={handleDelete}
+                    className="transition-colors duration-300 bg-destructive hover:bg-destructive/80"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
