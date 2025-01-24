@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { updateParticipant } from "@/lib/actions/participant.action";
+import { ParticipantDialog } from "@/components/ParticipantDialog";
 
 export const columns = [
   {
@@ -71,41 +73,24 @@ export const columns = [
         <Switch
           checked={paymentDone}
           onCheckedChange={async () => {
-            let stringifiedData;
+            let participantUpdated;
             setPaymentDone((oldChecked) => {
-              stringifiedData = JSON.stringify({
+              participantUpdated = {
                 ...participant,
                 paymentDone: !oldChecked,
-              });
+              };
               return !oldChecked;
             });
             try {
-              const response = await fetch(
-                (process.env.NEXT_PUBLIC_DEPLOYMENT_URL ||
-                  "http://localhost:8080") + "/api/participants",
-                {
-                  method: "PATCH",
-                  headers: {
-                    "Content-Type": "application/json", // Important pour signaler que le contenu est du JSON
-                  },
-                  body: stringifiedData,
-                }
+              const updatedParticipant = await updateParticipant(
+                participantUpdated
               );
-              if (response.ok) {
+              if (updatedParticipant)
                 toast({
                   title: "Succès",
                   description: "Paiement mis à jour!",
                   duration: 5000,
                 });
-              } else {
-                toast({
-                  title: "Erreur",
-                  description: "Le paiement n'a pas été mis à jour!",
-                  variant: "destructive",
-                  duration: 5000,
-                });
-                setPaymentDone((oldChecked) => !oldChecked);
-              }
             } catch (error) {
               toast({
                 title: "Erreur",
@@ -142,7 +127,9 @@ export const columns = [
               Voir le badge
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Voir le participant</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <ParticipantDialog participant={participant} />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

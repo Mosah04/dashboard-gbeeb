@@ -1,35 +1,20 @@
 import React from "react";
 import { DataTable } from "./data-table";
 import { columns } from "./column";
-import { cookies } from "next/headers";
-
-async function getParticipants() {
-  const sessionCookie = (await cookies()).get("session");
-
-  try {
-    const response = await fetch(
-      (process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "http://localhost:8080") +
-        "/api/participants",
-      {
-        headers: {
-          Cookie: `session=${sessionCookie.value}`,
-        },
-      }
-    );
-    if (response.ok) {
-      const { participants } = await response.json();
-      return participants;
-    }
-  } catch (error) {
-    console.log("Erreur lors de la récupération", error);
-  }
-}
+import { getParticipants } from "@/lib/actions/participant.action";
 
 const Participants = async () => {
-  const data = await getParticipants();
+  let participants;
+  try {
+    const data = await getParticipants();
+    participants = data.participants;
+  } catch (error) {
+    console.log(error);
+  }
+
   return (
     <div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={participants} />
     </div>
   );
 };

@@ -6,3 +6,7 @@ export const LoginValidation = z.object({
     .string()
     .min(8, "Le mot de passe doit contenir au moins 8 caractères."),
 });
+
+export const getParticipantValidation = (participant) => {
+  return;
+};

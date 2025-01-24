@@ -1,7 +1,10 @@
+"use server";
 import { ID, Query } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 import { parseStringify } from "../utils";
 import { createAdminClient, createSessionClient } from "../appwrite.config";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export const registerParticipant = async (participantImage, participant) => {
   let file;
@@ -33,4 +36,50 @@ export const registerParticipant = async (participantImage, participant) => {
   return parseStringify(newParticipant);
 };
 
-export const updateParticipantPayment = async (documentId, paymentDone) => {};
+export const getParticipants = async () => {
+  const sessionCookie = (await cookies()).get("session");
+  try {
+    const { databases } = await createSessionClient(sessionCookie.value);
+    const { documents: participants } = await databases.listDocuments(
+      process.env.DATABASE_ID,
+      process.env.PARTICIPANTS_COLLECTION_ID,
+      [Query.orderDesc("$createdAt")]
+    );
+    return { participants };
+  } catch (error) {
+    console.log("Erreur lors de la récupératon des participants", error);
+    throw new Error("Erreur lors de la récupératon des participants");
+  }
+};
+
+export const updateParticipant = async (participant) => {
+  const sessionCookie = (await cookies()).get("session");
+  try {
+    const { databases } = await createSessionClient(sessionCookie.value);
+
+    const updatedParticipant = await databases.updateDocument(
+      participant.$databaseId,
+      participant.$collectionId,
+      participant.$id,
+      cleanSpecialAttributes(participant)
+    );
+
+    if (!updatedParticipant)
+      throw new Error("Failed to update the participant");
+
+    revalidatePath("/participants");
+
+    return { updatedParticipant };
+  } catch (error) {
+    console.log("Erreur lors de la modification du participant", error);
+    throw new Error("Erreur lors de la modification du participants");
+  }
+};
+
+const cleanSpecialAttributes = (data) => {
+  const keys = Object.keys(data);
+  keys.forEach((key) => {
+    if (key.startsWith("$")) delete data[key];
+  });
+  return data;
+};

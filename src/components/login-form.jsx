@@ -27,6 +27,8 @@ export function LoginForm({ className, ...props }) {
     resolver: zodResolver(LoginValidation),
   });
 
+  console.log("email", register("email"));
+
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
