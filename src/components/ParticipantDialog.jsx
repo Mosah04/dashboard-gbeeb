@@ -42,7 +42,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-// Zod validation schema
 const sexOptions = ["Masculin", "Féminin"];
 const maritalStatusOptions = ["Célibataire", "Fiancé(e)", "Marié(e)"];
 const cellOptions = [
@@ -184,9 +183,9 @@ export function ParticipantDialog({ participant, onClose }) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="ghost" className="w-full font-normal">
+        <div className="w-full font-normal hover:bg-accent px-2 py-2 text-sm cursor-pointer rounded-md">
           Voir le participant
-        </Button>
+        </div>
       </DialogTrigger>
       <DialogContent className="w-full sm:max-w-[600px] max-h-[90%] flex flex-col">
         <DialogHeader>
@@ -510,7 +509,7 @@ export function ParticipantDialog({ participant, onClose }) {
               <Input
                 disabled={!active}
                 {...register("paymentMode")}
-                className="w-full text-sm"
+                className={`w-full text-sm ${disabledInputStyles}`}
                 type="text"
                 placeholder="Autre mode de paiement"
               />

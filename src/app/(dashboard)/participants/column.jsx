@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { updateParticipant } from "@/lib/actions/participant.action";
 import { ParticipantDialog } from "@/components/ParticipantDialog";
+import BadgeDialog from "@/components/BadgeDialog";
 
 export const columns = [
   {
@@ -122,18 +123,17 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Voir le badge: J'y suis</DropdownMenuItem>
-            <DropdownMenuItem
-            // onClick={() => navigator.clipboard.writeText(participant.email)}
-            >
-              Voir le badge: J'y serai
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="hover:bg-slate-600" asChild>
               <ParticipantDialog
                 participant={participant}
                 onClose={() => setOpen(false)}
               />
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <BadgeDialog participant={participant} badgeType="J'y serai" />
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <BadgeDialog participant={participant} badgeType="J'y suis" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
