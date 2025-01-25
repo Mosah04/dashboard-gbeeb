@@ -25,7 +25,11 @@ const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
       if (!response.ok) throw new Error("La récupération de l'image a échouée");
       const imageFrame = await response.blob();
 
-      const response2 = await fetch(participant.imageURL);
+      const response2 = await fetch(participant.imageURL, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       if (!response2.ok)
         throw new Error("La récupération de l'image a échouée");
       const imageParticipant = await response2.blob();
@@ -33,10 +37,7 @@ const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
       const backgroundSrc = URL.createObjectURL(imageFrame);
       const innerSrc = URL.createObjectURL(imageParticipant);
 
-      const { dataUrl, realWidth, realHeight } = await generateMergedImage(
-        backgroundSrc,
-        innerSrc
-      );
+      const { dataUrl } = await generateMergedImage(backgroundSrc, innerSrc);
       setBadgeURL(dataUrl);
     } catch (error) {
       console.log(error);
@@ -150,7 +151,7 @@ async function generateMergedImage(backgroundSrc, innerSrc) {
 
         // Simulation of object-position: top (top of the empty zone)
         const centerX = left + transparentWidth / 2 - drawWidth / 2;
-        const centerY = top; // Alignement au top de la zone
+        const centerY = top; // Alignement to the zone top
 
         // Images drawing
         ctx.drawImage(innerImage, centerX, centerY, drawWidth, drawHeight);
