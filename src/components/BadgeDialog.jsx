@@ -21,7 +21,11 @@ const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
       : process.env.NEXT_PUBLIC_BADGE_IS_LINK;
   const doGeneration = async () => {
     try {
-      const response = await fetch(frameLink);
+      const response = await fetch(frameLink, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
       if (!response.ok) throw new Error("La récupération de l'image a échouée");
       const imageFrame = await response.blob();
 
@@ -149,9 +153,9 @@ async function generateMergedImage(backgroundSrc, innerSrc) {
           drawHeight = transparentWidth / ratioInner;
         }
 
-        // Simulation of object-position: top (top of the empty zone)
+        // Simulation of object-position: top (top of the empty area)
         const centerX = left + transparentWidth / 2 - drawWidth / 2;
-        const centerY = top; // Alignement to the zone top
+        const centerY = top; // Alignment to the area top
 
         // Images drawing
         ctx.drawImage(innerImage, centerX, centerY, drawWidth, drawHeight);
