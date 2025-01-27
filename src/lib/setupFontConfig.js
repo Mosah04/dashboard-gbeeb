@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 
 async function setupFontConfig() {
   // const fontsDir = path.resolve("./public/fonts");
-  const fontsDir = process.cwd();
+  const fontsDir = os.tmpdir();
 
   const fontConfigContent = `
     <?xml version="1.0"?>
