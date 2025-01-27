@@ -113,10 +113,10 @@ async function generateMergedImage(
   console.log("Base image composited");
 
   try {
-    const fontPath = await setupFontConfig();
+    // const fontPath = await setupFontConfig();
     // Save the font file temporarily
-    const tempFontPath = path.join(fontPath, "custom-font.ttf");
-    await fs.writeFile(tempFontPath, fontBuffer);
+    // const tempFontPath = path.join(fontPath, "custom-font.ttf");
+    // await fs.writeFile(tempFontPath, fontBuffer);
     console.log(`Font saved temporarily at: ${tempFontPath}`);
 
     // Generate SVG for text overlays
@@ -188,7 +188,7 @@ async function generateMergedImage(
     console.log("Text overlay composited");
 
     // Clean up the temporary font file
-    await fs.unlink(tempFontPath);
+    // await fs.unlink(tempFontPath);
     console.log("Temporary font file cleaned up");
   } catch (error) {
     console.error("Error processing text overlay:", error);
