@@ -117,7 +117,7 @@ async function generateMergedImage(
     // Save the font file temporarily
     // const tempFontPath = path.join(fontPath, "custom-font.ttf");
     // await fs.writeFile(tempFontPath, fontBuffer);
-    console.log(`Font saved temporarily at: ${tempFontPath}`);
+    // console.log(`Font saved temporarily at: ${tempFontPath}`);
 
     // Generate SVG for text overlays
     const svgText = textParams
