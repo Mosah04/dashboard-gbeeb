@@ -44,6 +44,14 @@ async function generateMergedImage(
   textParams,
   fontBuffer
 ) {
+  const fontConfigPath = path.join(process.cwd(), "fonts", "fonts.conf");
+  const fontPath = path.join(process.cwd(), "fonts", "Viga-Regular.ttf");
+
+  sharp.cache(false);
+  if (process.env.NODE_ENV === "production") {
+    process.env.FONTCONFIG_PATH = "/var/task/fonts";
+    process.env.LD_LIBRARY_PATH = "/var/task";
+  }
   console.log("Starting image generation process");
   const frame = sharp(frameBuffer);
   const inner = sharp(innerBuffer);

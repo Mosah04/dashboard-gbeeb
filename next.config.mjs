@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    "/api/**/*": ["fonts/**/*"],
+  },
   api: {
     bodyParser: {
       sizeLimit: "10mb",
