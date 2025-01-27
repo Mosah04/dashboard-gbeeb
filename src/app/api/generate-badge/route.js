@@ -115,7 +115,7 @@ async function generateMergedImage(
   try {
     const fontPath = await setupFontConfig();
     // Save the font file temporarily
-    const tempFontPath = fontPath + "/custom-font.ttf";
+    const tempFontPath = path.join(fontPath, "custom-font.ttf");
     await fs.writeFile(tempFontPath, fontBuffer);
     console.log(`Font saved temporarily at: ${tempFontPath}`);
 

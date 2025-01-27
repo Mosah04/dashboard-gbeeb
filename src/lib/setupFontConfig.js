@@ -3,7 +3,7 @@ import path from "path";
 
 async function setupFontConfig() {
   // const fontsDir = path.resolve("./public/fonts");
-  const fontsDir = path.resolve(".");
+  const fontsDir = process.cwd();
 
   const fontConfigContent = `
     <?xml version="1.0"?>
