@@ -217,7 +217,7 @@ const sendEmailToParticipant = async function (email, name, attachment) {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "GBEEB <GBEEB.MONO@noreply.org>",
+      from: "GBEEB <onboarding@resend.dev>",
       to: [email],
       subject: `Bienvenue au Camp GBEEB Mono 2025 – Votre badge "J’y serai" !`,
       html: `<p>Salut ${name}!!</p>,
