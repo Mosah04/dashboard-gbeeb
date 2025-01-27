@@ -74,7 +74,7 @@ export async function POST(req) {
             isPresenceBadge: false,
             participantCell: registeredParticipant.cell,
             participantName: registeredParticipant.name,
-            sendEmail: true,
+            sendMail: true,
             participantEmail: registeredParticipant.email,
           }),
         }
