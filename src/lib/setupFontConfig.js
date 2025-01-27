@@ -4,7 +4,7 @@ import os from "os";
 
 async function setupFontConfig() {
   // const fontsDir = path.resolve("./public/fonts");
-  const fontsDir = os.tmpdir();
+  const fontsDir = os.platform() === "win32" ? os.tmpdir() : "/tmp";
 
   const fontConfigContent = `
     <?xml version="1.0"?>
