@@ -146,7 +146,7 @@ async function generateMergedImage(
         <text
           x="${param.x}"
           y="${param.y + verticalOffset - padding}"
-          font-family="CustomFont, sans-serif"
+          font-family="CustomFont, Viga, Viga-Regular, sans-serif"
           font-size="${param.fontSize}px"
           font-weight="600"
           fill="${param.color}"
