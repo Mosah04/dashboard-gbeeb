@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 
 const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
@@ -19,39 +19,37 @@ const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
     badgeType === "J'y serai"
       ? process.env.NEXT_PUBLIC_BADGE_WILL_LINK
       : process.env.NEXT_PUBLIC_BADGE_IS_LINK;
-  const doGeneration = async () => {
+
+  const generateBadge = async () => {
     try {
-      const response = await fetch(frameLink, {
+      const response = await fetch("/api/generate-badge", {
+        method: "POST",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          frameLink,
+          participantImageURL: participant.imageURL,
+          isPresenceBadge: badgeType === "J'y suis",
+          participantCell: participant.cell,
+          participantName: participant.name,
+        }),
       });
-      if (!response.ok) throw new Error("La récupération de l'image a échouée");
-      const imageFrame = await response.blob();
 
-      const response2 = await fetch(participant.imageURL, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
-      if (!response2.ok)
-        throw new Error("La récupération de l'image a échouée");
-      const imageParticipant = await response2.blob();
+      if (!response.ok) throw new Error("Badge generation failed");
 
-      const backgroundSrc = URL.createObjectURL(imageFrame);
-      const innerSrc = URL.createObjectURL(imageParticipant);
-
-      const { dataUrl } = await generateMergedImage(backgroundSrc, innerSrc);
-      setBadgeURL(dataUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setBadgeURL(url);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
   return (
     <Dialog>
-      <DialogTrigger onClick={doGeneration} asChild>
+      <DialogTrigger onClick={generateBadge} asChild>
         <div className="w-full font-normal hover:bg-accent px-2 py-2 text-sm cursor-pointer rounded-md">
           Voir le badge: {badgeType}
         </div>
@@ -65,6 +63,7 @@ const BadgeDialog = ({ participant, badgeType = "J'y serai" }) => {
             Vous pouvez voir le badge du participant et le télécharger.
           </DialogDescription>
         </DialogHeader>
+
         {loading ? (
           <Skeleton className="w-full h-[400px] bg-foreground/50" />
         ) : (
