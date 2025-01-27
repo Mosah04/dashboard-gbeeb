@@ -207,6 +207,43 @@ async function generateMergedImage(
   return compositeImage;
 }
 
+const sendEmailToParticipant = async function (email, name, attachment) {
+  const { RESEND_API_KEY } = process.env;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: "GBEEB <GBEEB.MONO@noreply.org>",
+      to: [email],
+      subject: `Bienvenue au Camp GBEEB Mono 2025 – Votre badge "J’y serai" !`,
+      html: `<p>Salut ${name}!!</p>,
+
+            <p>Bienvenue parmi nous ! 🎉 Votre inscription au Camp GBEEB Mono est confirmée, et nous sommes ravis de vous compter parmi les participants.</p>
+
+            <p>Pour célébrer, voici votre badge "J’y serai" en pièce jointe. N'hésitez pas à le partager autour de vous</p>
+
+            <p>Bloquez bien la date : <strong>21 au 24 Février 2025</strong>, et préparez-vous à un événement riche en rencontres et découvertes. Si ce n’est pas déjà fait, pensez à inviter vos amis ou collègues – l’expérience est toujours meilleure à plusieurs !</p>
+            <p>À très vite,</p>
+            <p>Le staff du camp</p>`,
+      attachments: [
+        {
+          content: attachment,
+          filename: "MonBadge.png",
+        },
+      ],
+    }),
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    return Response.json(data);
+  }
+};
+
 const textParams = [
   {
     x: 630,
@@ -241,6 +278,8 @@ export async function POST(req) {
       isPresenceBadge,
       participantCell,
       participantName,
+      sendMail,
+      participantEmail,
     } = await req.json();
     console.log("Request body parsed:", {
       frameLink,
@@ -276,6 +315,14 @@ export async function POST(req) {
       fontBuffer
     );
     console.log("Merged image generated");
+
+    if (sendMail) {
+      await sendEmailToParticipant(
+        participantEmail,
+        participantName,
+        mergedImageBuffer.toString("base64")
+      );
+    }
 
     return new NextResponse(mergedImageBuffer, {
       status: 200,

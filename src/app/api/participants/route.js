@@ -56,7 +56,30 @@ export async function POST(req) {
       formData.get("image"),
       participant
     );
-    if (registeredParticipant) revalidatePath("/paticipants");
+    if (registeredParticipant) {
+      revalidatePath("/participants");
+
+      await fetch(
+        `${
+          process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "https://localhost:8080"
+        }/api/generate-badge`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            frameLink: process.env.NEXT_PUBLIC_BADGE_WILL_LINK,
+            participantImageURL: registeredParticipant.imageURL,
+            isPresenceBadge: false,
+            participantCell: registeredParticipant.cell,
+            participantName: registeredParticipant.name,
+            sendEmail: true,
+            participantEmail: registeredParticipant.email,
+          }),
+        }
+      );
+    }
     return NextResponse.json(
       { success: true, participant: registeredParticipant },
       { status: 200 }
