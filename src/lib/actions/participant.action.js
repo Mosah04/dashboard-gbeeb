@@ -43,7 +43,7 @@ export const getParticipants = async () => {
     const { documents: participants } = await databases.listDocuments(
       process.env.DATABASE_ID,
       process.env.PARTICIPANTS_COLLECTION_ID,
-      [Query.orderDesc("$createdAt")]
+      [Query.orderDesc("$createdAt"), Query.limit(150)]
     );
     return { participants };
   } catch (error) {
