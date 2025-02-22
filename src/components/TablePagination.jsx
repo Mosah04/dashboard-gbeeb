@@ -21,52 +21,73 @@ const TablePagination = ({ table }) => {
   console.log("End");
 
   return (
-    <div className="flex flex-row gap-1 items-center">
-      {buttons.map((button, index) => (
-        <React.Fragment key={index}>
-          {button === "Précédent" || button === "Suivant" ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (button === "Précédent") {
-                  table.previousPage();
-                } else {
-                  table.nextPage();
-                }
-              }}
-            >
-              <span className="sr-only">{button}</span>
-              {button === "Précédent" ? (
-                <ChevronLeft />
-              ) : (
-                <ChevronLeft className="rotate-180" />
-              )}
-            </Button>
-          ) : button === "..." ? (
-            <span className="px-2">...</span>
-          ) : (
-            <ToggleGroup
-              value={(table.getState().pagination.pageIndex + 1).toString()}
-              onValueChange={(value) => table.setPageIndex(Number(value) - 1)}
-              type="single"
-            >
-              <ToggleGroupItem
-                key={button}
-                value={button.toString()}
-                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+    <div className="flex flex-row flex-wrap items-center w-full justify-between gap-4">
+      <PaginationInfo
+        page={table.getState().pagination.pageIndex}
+        itemsPerPage={table.getState().pagination.pageSize}
+        totalItems={table.getFilteredRowModel().rows.length}
+      />
+      <div className="flex flex-row gap-1 items-center">
+        {buttons.map((button, index) => (
+          <React.Fragment key={index}>
+            {button === "Précédent" || button === "Suivant" ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (button === "Précédent") {
+                    table.previousPage();
+                  } else {
+                    table.nextPage();
+                  }
+                }}
               >
-                {button}
-              </ToggleGroupItem>
-            </ToggleGroup>
-          )}
-        </React.Fragment>
-      ))}
+                <span className="sr-only">{button}</span>
+                {button === "Précédent" ? (
+                  <ChevronLeft />
+                ) : (
+                  <ChevronLeft className="rotate-180" />
+                )}
+              </Button>
+            ) : button === "..." ? (
+              <span className="px-2">...</span>
+            ) : (
+              <ToggleGroup
+                value={(table.getState().pagination.pageIndex + 1).toString()}
+                onValueChange={(value) => table.setPageIndex(Number(value) - 1)}
+                type="single"
+              >
+                <ToggleGroupItem
+                  key={button}
+                  value={button.toString()}
+                  className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                >
+                  {button}
+                </ToggleGroupItem>
+              </ToggleGroup>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default TablePagination;
+
+const PaginationInfo = ({ page, itemsPerPage, totalItems }) => {
+  const start = page * itemsPerPage + 1;
+  const end = Math.min((page + 1) * itemsPerPage, totalItems);
+
+  return (
+    <div className="text-sm">
+      <span className="font-medium">
+        {start} - {end}
+      </span>{" "}
+      sur <span className="font-medium">{totalItems}</span> éléments
+    </div>
+  );
+};
 
 const generatePagination = (currentPage, pageTotal, maxButtons) => {
   let buttons = [];
